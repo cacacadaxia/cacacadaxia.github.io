@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>IMU的积分表示</title>
+  <meta name="description" content="[TOC]">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="IMU的积分表示">
+  <meta name="twitter:description" content="[TOC]">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="IMU的积分表示">
+  <meta property="og:description" content="[TOC]">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2016/11/IMU%E7%9A%84%E7%A7%AF%E5%88%86%E8%A1%A8%E7%A4%BA/">
+  <link rel="alternate" type="application/rss+xml" title="擦擦擦大侠" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?8ba1c6be0953b6f9c2ba38e57f615421";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-84134159-3', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/support" title="support" class="btn-mobile-menu__icon">
+                      技术支持
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 擦擦擦大侠 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                cacacadaxia
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / 机器学习
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 擦擦擦大侠" class="blog-button">擦擦擦大侠</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">个人站</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的个人站~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/support" title="support">技术支持</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <head>
+  <link rel="stylesheet" href="/css/post.css">
+</head>
+
+<article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">IMU的积分表示</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2016-11-20 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2016-11-20</time>  
+
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  
+    <h2 class="post-title">目录</h2>
+    <ul>
+  <li><a href="#博客整理">博客整理</a>
+    <ul>
+      <li><a href="#惯性导航中的一些问题">惯性导航中的一些问题</a>
+        <ul>
+          <li><a href="#四元数的运算总结">四元数的运算总结</a></li>
+          <li><a href="#四元数的表示方法是什么">四元数的表示方法是什么？</a></li>
+          <li><a href="#科式加速度的表示">科式加速度的表示</a></li>
+          <li><a href="#什么时候能够用到科式加速度呢">什么时候能够用到科式加速度呢？</a></li>
+          <li><a href="#在imu中如何确定协方差矩阵有没有一个简单的理解或者通用的解释">在IMU中如何确定协方差矩阵？有没有一个简单的理解？或者通用的解释？</a></li>
+          <li><a href="#如何确定协方差矩阵的更新">如何确定协方差矩阵的更新？</a></li>
+          <li><a href="#如何将角度积分差分化表示">如何将角度积分差分化表示？</a></li>
+          <li><a href="#但是最后一步是怎么推导的">但是最后一步是怎么推导的？</a></li>
+          <li><a href="#为什么要用误差状态量去表示呢">为什么要用误差状态量去表示呢？</a></li>
+          <li><a href="#是如何将误差状态与控制量相结合的">是如何将误差状态与控制量相结合的？</a></li>
+          <li><a href="#四元数的运算是什么样的">四元数的运算是什么样的？</a></li>
+          <li><a href="#最后一点四元数与李代数之间的关系">最后一点：四元数与李代数之间的关系？</a></li>
+        </ul>
+      </li>
+      <li><a href="#eskf总结陈述">ESKF总结陈述</a>
+        <ul>
+          <li><a href="#首先是运动学方程中">首先是运动学方程中：</a></li>
+          <li><a href="#其次是测量方程">其次是测量方程：</a></li>
+          <li><a href="#其中有比较重要的推导方法">其中有比较重要的推导方法</a></li>
+          <li><a href="#欧拉角的表示">欧拉角的表示</a></li>
+          <li><a href="#四元数中参与的运算">四元数中参与的运算</a></li>
+        </ul>
+      </li>
+      <li><a href="#eskf的实现">ESKF的实现</a></li>
+    </ul>
+  </li>
+</ul>
+
+  
+
+  <section class="post">
+    <p>[TOC]</p>
+
+<p>参考目录：</p>
+
+<h3 id="博客整理">博客整理</h3>
+
+<p>在文献<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>的做法中，</p>
+
+<h4 id="惯性导航中的一些问题">惯性导航中的一些问题</h4>
+
+<h5 id="四元数的运算总结">四元数的运算总结</h5>
+
+<p>离散与连续之间的关系，比较让人迷惑。</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200629093038.png" alt="20200629093038" style="zoom:10%;" /></p>
+
+<h5 id="四元数的表示方法是什么">四元数的表示方法是什么？</h5>
+
+<p>可以这样表示：
+<script type="math/tex">% <![CDATA[
+\dot{q}_{e}^{b}(t)=\frac{1}{2}\left[\begin{array}{cccc}
+0 & -\omega_{x} & -\omega_{y} & -\omega_{z} \\
+\omega_{x} & 0 & \omega_{z} & -\omega_{y} \\
+\omega_{y} & -\omega_{z} & 0 & \omega_{x} \\
+\omega_{z} & \omega_{y} & -\omega_{x} & 0
+\end{array}\right] q_{e}^{b}(t) %]]></script>
+在MEKF算法的差分化之后，有这样的结果：
+<script type="math/tex">\boldsymbol{q}(t+\Delta t)=\boldsymbol{q}(t) \otimes e^{\frac{1}{2} \boldsymbol{q}_{\omega} \Delta t}</script>
+也可以表示为：
+<script type="math/tex">\mathbf{q}_{b, b_{k}} \otimes \delta \mathbf{q}_{b_{k} b_{k}^{\prime}}=\delta \mathbf{q}_{b, b_{k}} \otimes\left[\begin{array}{c}
+1 \\
+\frac{1}{2} \delta \theta_{b_{k} b_{k}}
+\end{array}\right]</script></p>
+
+<h5 id="科式加速度的表示">科式加速度的表示</h5>
+
+<p><a href="https://fzheng.me/2016/11/20/imu_model_eq/">参考</a>；</p>
+
+<p>科式加速度主要用来描述参考系与惯性系之间的关系。</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200620182700.png" alt="20200620182700" /></p>
+
+<p>我们来逐项分析上面这个式子。第一项中 αα 为 {B} 的角加速度，所以第一项的物理意义是 {B} 旋转所造成的 P 的切向加速度。第二项是 {B} 旋转所造成的向心加速度。第四项为 P 相对于 {B} 的加速度，但在惯性系 {A} 下表达——类似于 vrvr，定义相对加速度 arar。第三项比较特殊，为 {B} 的旋转运动与 P 相对 {B} 的平移运动耦合产生的加速度，称为「科氏加速度」。可以看到，除了第四项外，另外三项都和 {B} 的旋转有关。</p>
+
+<h5 id="什么时候能够用到科式加速度呢">什么时候能够用到科式加速度呢？</h5>
+
+<p>在MSCKF1中，考虑的是参考系（b），因此需要考虑；但在MSCKF2中，考虑的是惯性系（a），所以就不需要考虑科式加速度了。</p>
+
+<blockquote>
+  <p>这里存在一个问题：既然不考虑科式加速度又简便也符合逻辑，那么为什么一些文献中采用考虑科式加速度的做法呢？</p>
+</blockquote>
+
+<h5 id="在imu中如何确定协方差矩阵有没有一个简单的理解或者通用的解释">在IMU中如何确定协方差矩阵？有没有一个简单的理解？或者通用的解释？</h5>
+
+<p>这个分析过程需要随机过程的知识，主要参考<a href="https://fzheng.me/2016/11/20/imu_model_eq/">博客</a>与<a href="https://zhuanlan.zhihu.com/p/71202672">博客</a>的内容。</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200620191047.png" alt="20200620191047" style="zoom:20%;" /></p>
+
+<blockquote>
+  <p>这里已经给出了比较合理的解释，可以根据这个关系去确定Q矩阵与R矩阵。上面的noise是白噪声，bias代表随机游走偏差，为白噪声的积分。</p>
+
+  <p>这里的问题是：<strong>这个部分到底是不是为了确定Q的大小？</strong>其实我觉得这里的描述未必准确。</p>
+
+  <p><span style="color:blue;"><strong>这里给出了连续与离散之间的关系，但是实际上还有一层关系：积分与未积分的关系</strong></span>。</p>
+</blockquote>
+
+<ul>
+  <li>在之前的论文里是这么做的</li>
+</ul>
+
+<script type="math/tex; mode=display">Q_{d}=Q_{c} \Delta t \quad Q_{c}=\text 
+{blkdiag}\left(\sigma_{a c c}^{2}\right)</script>
+
+<blockquote>
+  <p>我觉得这个和加速度计的固有性质相关。</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://zhuanlan.zhihu.com/p/71202672">博客</a>的内容</li>
+</ul>
+
+<p>计算方法如下：<span style="color:red;">但是这里是白噪声还是随机游走？</span>理论上应该是白噪声，因为没有讨论随机游走。
+<script type="math/tex">\frac{Q_{c}}{\Delta t} *{\Delta t}^{2}=\frac{b l k d i a g\left(\sigma_{g y r o}^{2}\right)}{\Delta t} *{\Delta t^{2}}</script></p>
+
+<ul>
+  <li>在<a href="https://zhuanlan.zhihu.com/p/88756311">博客</a>中，提到一种ESKF的姿态角度估计方法，对于Q的求解，给出下面的结果：</li>
+</ul>
+
+<script type="math/tex; mode=display">\begin{array}{l}
+\boldsymbol{V}_{i}=\sigma_{a_{n}}^{2} \Delta t^{2} \boldsymbol{I} \\
+\mathbf{\Theta}_{i}=\sigma_{\omega_{n}}^{2} \Delta t^{2} \boldsymbol{I} \\
+\boldsymbol{A}_{i}=\sigma_{a_{\omega}}^{2} \Delta t \boldsymbol{I} \\
+\boldsymbol{\Omega}_{i}=\sigma_{\omega_{\omega}}^{2} \Delta t \boldsymbol{I}
+\end{array}</script>
+
+<blockquote>
+  <p>但是这里面的加速度计于陀螺的表示都是一样的，怎么解释？</p>
+
+  <p>这里提到了一个积分的过程。</p>
+</blockquote>
+
+<p>显然与上面的矛盾，这怎么处理呢？</p>
+
+<h5 id="如何确定协方差矩阵的更新">如何确定协方差矩阵的更新？</h5>
+
+<p>要推导预积分量的协方差，我们需要知道 imu 噪声和预积分量 之间的线性递推关系。协方差矩阵可以这样推导：<span style="color:blue;"><strong>这个方差的积累公式需要注意一下，实际上状态估计大多都是这么做的。</strong></span>
+<script type="math/tex">\boldsymbol{\Sigma}_{i k}=\mathbf{F}_{k-1} \boldsymbol{\Sigma}_{i k-1} \mathbf{F}_{k-1}^{\top}+\mathbf{G}_{k-1} \boldsymbol{\Sigma}_{\mathbf{n}} \mathbf{G}_{k-1}^{\top}</script>
+其中，$Σ_n$ 是测量噪声的协方差矩阵，方差从 i 时刻开始进行递推，$Σ_{ii} = 0$。</p>
+
+<p>但是在传统的卡尔曼滤波器的递推公式中，有下面的结果：</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200621091350.png" alt="20200621091350" style="zoom:50%;" /></p>
+
+<p>在这里更新的过程并没有考虑到控制量u的雅可比矩阵，这是为什么呢？<span style="color:blue;"><strong>因为u的雅可比矩阵只影响到P矩阵的更新，而并不影响标称值的更新。（标称值的更新依赖于更加准确的非线性状态更新方程）</strong></span>。</p>
+
+<p>这里Q代表的过程误差方差矩阵，对应的维度是状态量。利用控制量与运动学方程，确实可以求出来状态量的误差方差矩阵。相当于状态量的方差有一部分是由控制量决定的。但是如果系统中没有控制量，只有状态量，那么就需要直接给出Q矩阵的值。实际上这种系统也是比较多的。</p>
+
+<p>在一个开源项目中是这样确定Q的大小的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sGPS</span>     <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="mf">8.8</span><span class="o">*</span><span class="n">dt</span><span class="o">**</span><span class="mi">2</span>  <span class="c1"># assume 8.8m/s2 as maximum acceleration, forcing the vehicle
+</span><span class="n">sCourse</span>  <span class="o">=</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">dt</span> <span class="c1"># assume 0.1rad/s as maximum turn rate for the vehicle
+</span><span class="n">sVelocity</span><span class="o">=</span> <span class="mf">8.8</span><span class="o">*</span><span class="n">dt</span> <span class="c1"># assume 8.8m/s2 as maximum acceleration, forcing the vehicle
+</span><span class="n">sYaw</span>     <span class="o">=</span> <span class="mf">1.0</span><span class="o">*</span><span class="n">dt</span> <span class="c1"># assume 1.0rad/s2 as the maximum turn rate acceleration for the vehicle
+</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="n">sGPS</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">sGPS</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">sCourse</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">sVelocity</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">sYaw</span><span class="o">**</span><span class="mi">2</span><span class="p">])</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>可以看到这里的Q是用来描述连续微分运动学方程中的微分量的。因为这里的Q只是在定义误差量的过程噪声，所以是比较合理的。</p>
+
+</blockquote>
+
+<p>最终在MEKF<a href="https://zhuanlan.zhihu.com/p/71202815">的博客中找到答案</a>：</p>
+
+<p>在文献1中找到下面的佐证（附录部分）。下面的差分化是利用了第二种状态方程的递推方法，然后进行离散化。</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200623100552.png" alt="20200623100552" style="zoom:25%;" /></p>
+
+<p>由此便得知协方差Q矩阵的确定过程。实际上<span style="color:green;"><strong>在实验中，并没有特别严格的定义，实际上两种都可以</strong></span>。对比试验结果发现其影响比较小。</p>
+
+<h5 id="如何将角度积分差分化表示">如何将角度积分差分化表示？</h5>
+
+<p>在VIO中，对于IMU的处理流程是：预积分–预积分的离散形式–推导预积分的方差。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>类别</th>
+      <th>方法</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>博主</td>
+      <td>差分化–&gt;离散化</td>
+    </tr>
+    <tr>
+      <td>VIO</td>
+      <td>离散化–&gt;差分化</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><span style="color:blue;"><strong>实际上就是两个部分：离散化，差分化。虽然都不是<br />什么复杂的数学理论，但是常常让人感到confused</strong></span></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/image-20200619081139836.png" alt="image-20200619081139836" /></p>
+
+<blockquote>
+  <p>实际上IMU组件给系统系统的运动学方程，在状态估计中可以认为是一种约束。同时测量方程也可以认为是另外一种约束。</p>
+
+  <p>在优化系统中，将这两种约束都写入到优化函数中，并且保证惩罚函数是线性的，这样就可以利用梯度下降法简单求解了。</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>类别</th>
+      <th>方法</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>基于一阶泰勒展开误差递推方程：方法1</td>
+      <td>离散化–&gt;差分化</td>
+    </tr>
+    <tr>
+      <td>基于误差随时间变化的递推方程：方法2</td>
+      <td>差分化–&gt;离散化</td>
+    </tr>
+    <tr>
+      <td>备注</td>
+      <td><span style="color:blue;"><strong>实际上就是两个部分：离散化，差分化。虽然都不是<br />什么复杂的数学理论，但是常常让人感到confused<br />另外，差分化就是将其写成误差状态的形式</strong></span></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>但是因为方法2中需要知道状态量的连续导数关系（随时间变化的关系），很多系统都没办法求解这部分（在PVQ系统中可以做）。方法1中的离散形式比较符合对EKF的解释和EKF中协方差更新的方法，因此更加常用。</p>
+
+<p><span style="color:blue;"><strong>总结来说，如果系统是连续方程，那么需要先进行error state化之后再进行离散化。如果系统是离散方程，那么直接进行error state化即可</strong></span>。</p>
+
+<p>下面是详细定义：</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/image-20200619092634104.png" alt="image-20200619092634104" /></p>
+
+<p><span style="color:blue;"><strong>于是有下面的结果，这里的变化很重要</strong></span>：</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200619092641.png" alt="20200619092641" /></p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/image-20200619092726511.png" alt="image-20200619092726511" /></p>
+
+<h5 id="但是最后一步是怎么推导的">但是最后一步是怎么推导的？</h5>
+
+<p>在上面的两种方法中，第一种是符合EKF的状态方程的递推关系的；第二种是目前VIO算法中的主流做法。应该是殊途同归的两种做法，但是第一种更为通用。</p>
+
+<p><span style="color:red;">下面的推导是怎么完成的</span>？
+<script type="math/tex">\begin{array}{l}
+\dot{\delta \mathbf{v}}=\mathbf{R} \delta \mathbf{a}^{b}+\mathbf{R}[\delta \boldsymbol{\theta}]_{\times}\left(\mathbf{a}^{b}+\delta \mathbf{a}^{b}\right)+\delta \mathbf{g} \\
+\dot{\delta \mathbf{v}}=\mathbf{R} \delta \mathbf{a}^{\mathbf{b}}-\mathbf{R}\left[\mathbf{a}^{b}\right]_{\times} \delta \boldsymbol{\theta}+\delta \mathbf{g}
+\end{array}</script></p>
+
+<p>最符合逻辑的就是：<span style="color:red;"><strong>两个小量相乘，最后的结果就是无穷小，可以忽略</strong></span>。</p>
+
+<p>与ESKF的区别是什么？下面给出ESKF的定义。
+<script type="math/tex">\dot{\delta \mathbf{v}}=-\mathbf{R}\left[\mathbf{a}_{m}-\mathbf{a}_{b}\right]_{\times} \delta \boldsymbol{\theta}-\mathbf{R} \delta \mathbf{a}_{b}+\delta \mathbf{g}-\mathbf{R} \mathbf{a}_{n}</script>
+但是如何比较两者的区别？有待后续完成。</p>
+
+<h5 id="为什么要用误差状态量去表示呢">为什么要用误差状态量去表示呢？</h5>
+
+<p>这部分参考Quaternion kinematics for the error-state Kalman filte<a href="https://zhuanlan.zhihu.com/p/88756311">和博客</a>。</p>
+
+<ul>
+  <li>定向误差状态是最小的，避免了与过度参数化相关的问题，以及相关协方差矩阵奇异性的风险，这通常是由强制约束引起的</li>
+  <li>误差状态系统总是在接近原始系统的情况下运行，因此远离可能的参数奇点、万向锁问题等，从而保证线性化的有效性始终保持不变</li>
+  <li>错误状态总是很小，这意味着所有二阶部分都可以忽略不计。这使得雅可比矩阵的计算变得非常简单和快速。有些雅可比数甚至可能是常数或等于可用状态量。</li>
+  <li>误差动力学是缓慢的，因为所有的大信号动力学都已集成到标称状态。这意味着我们可以以低于预测的速度应用KF修正</li>
+</ul>
+
+<blockquote>
+  <p>什么是动力学是缓慢的？变化是缓慢的？</p>
+</blockquote>
+
+<blockquote>
+  <p><span style="color:green;"><strong>是不是用来描述振动变化，有着更为出色的性能</strong></span>？如果是的话，这也是一个可以发论文的点。</p>
+
+  <p>是不是和李代数去表示是有关系的，只有在小量的时候，在切空间的性质才可以成立。</p>
+</blockquote>
+
+<h5 id="是如何将误差状态与控制量相结合的">是如何将误差状态与控制量相结合的？</h5>
+
+<p>角速度积分表示：
+<script type="math/tex">% <![CDATA[
+\begin{aligned}
+_{I}^{G} \dot{\boldsymbol{R}} &=_{I}^{G} \boldsymbol{R}\left[\boldsymbol{\omega}_{m}-\boldsymbol{b}_{g}-\boldsymbol{n}_{w}\right] \times \\
+\dot{\boldsymbol{b}}_{g} &=\mathbf{0}+\boldsymbol{n}_{g}
+\end{aligned} %]]></script>
+下面是旋转矩阵的积分过程：
+<script type="math/tex">\frac{\mathrm{d} \mathbf{R}}{\mathrm{d} t}=\mathbf{R}[\boldsymbol{\omega}]_{\times}</script>
+得到离散化之后的：
+<script type="math/tex">\mathbf{R}(t+\Delta t)=\mathbf{R}(t) e^{[\omega]_{\times} \Delta t}</script></p>
+
+<p>参考EKF-Based IMU Orientation Estimation，有下面的运动学方程：
+<script type="math/tex">% <![CDATA[
+\begin{aligned}
+\delta \boldsymbol{\theta} &=\operatorname{Exp}\left[\left(\boldsymbol{\omega}_{m}-\boldsymbol{b}_{g}\right) \Delta t\right]^{T} \delta \boldsymbol{\theta}-\delta \boldsymbol{b}_{g} \Delta t+\boldsymbol{\theta}_{i} \\
+\delta \boldsymbol{b}_{g} &=\delta \boldsymbol{b}_{g}+\boldsymbol{\omega}_{i}
+\end{aligned} %]]></script>
+表示为：
+<script type="math/tex">% <![CDATA[
+\left[\begin{array}{c}
+\delta \boldsymbol{\theta} \\
+\delta \boldsymbol{b}_{g}
+\end{array}\right]=\underbrace{\left[\begin{array}{cc}
+\operatorname{Exp}\left[\left(\boldsymbol{\omega}_{m}-\boldsymbol{b}_{g}\right) \Delta t\right]^{T} & -\boldsymbol{I} \Delta t \\
+\boldsymbol{0} & \boldsymbol{I}
+\end{array}\right]}_{\boldsymbol{F}_{\boldsymbol{x}}}\left[\begin{array}{c}
+\boldsymbol{\delta} \boldsymbol{\theta} \\
+\delta \boldsymbol{b}_{g}
+\end{array}\right]+\underbrace{\left[\begin{array}{cc}
+\boldsymbol{I} & \boldsymbol{0} \\
+\boldsymbol{0} & \boldsymbol{I}
+\end{array}\right]}_{\boldsymbol{F}_{i}}\left[\begin{array}{c}
+\boldsymbol{\theta}_{i} \\
+\boldsymbol{\omega}_{i}
+\end{array}\right] %]]></script></p>
+
+<p>这里其实就说明了：sita与delta_sita的方差的对应关系。</p>
+
+<h5 id="四元数的运算是什么样的">四元数的运算是什么样的？</h5>
+
+<p>四元数相乘可以写成：
+<script type="math/tex">\mathbf{q}_{1} \otimes \mathbf{q}_{2}=[\mathbf{q}]_{L} \mathbf{q}_{2}=[\mathbf{q}]_{R} \mathbf{q}</script>
+其中
+<script type="math/tex">% <![CDATA[
+[\mathbf{q}]_{L}=\left[\begin{array}{cccc}
+q_{w} & -q_{x} & -q_{y} & -q_{z} \\
+q_{x} & q_{w} & -q_{z} & q_{y} \\
+q_{y} & q_{z} & q_{w} & -q_{x} \\
+q_{z} & -q_{y} & q_{x} & q_{w}
+\end{array}\right]=q_{w} \mathbf{I}+\left[\begin{array}{cc}
+0 & -\mathbf{q}_{v}^{\mathrm{T}} \\
+\mathbf{q}_{v} & {\left[\mathbf{q}_{v}\right]_{\times}}
+\end{array}\right] %]]></script></p>
+
+<h5 id="最后一点四元数与李代数之间的关系">最后一点：四元数与李代数之间的关系？</h5>
+
+<ol>
+  <li>首先是李代数的部分：</li>
+</ol>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/image-20200622104950178.png" alt="image-20200622104950178" /></p>
+
+<ol>
+  <li>其次是罗德里格斯旋转公式：</li>
+</ol>
+
+<script type="math/tex; mode=display">\mathbf{R}=\mathbf{I}+\sin \phi[\mathbf{u}]_{\times}+(1-\cos \phi)[\mathbf{u}]_{\times}^{2}</script>
+
+<ol>
+  <li>描述旋转群与四元数之间的关系：参考文献<sup id="fnref:1:1"><a href="#fn:1" class="footnote">1</a></sup>的 4.2.2</li>
+</ol>
+
+<h4 id="eskf总结陈述">ESKF总结陈述</h4>
+
+<p>ESKF就是用了上述“基于误差随时间变化”求解方法，首先写成error state，然后进行离散化得到IMU的递推方程。/</p>
+
+<p>参数表如下：</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200622112302.png" alt="20200622112302" /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>English</th>
+      <th>中文</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>nominal state</td>
+      <td>标称状态</td>
+    </tr>
+    <tr>
+      <td>true state</td>
+      <td>真实状态</td>
+    </tr>
+    <tr>
+      <td>error state</td>
+      <td>误差状态</td>
+    </tr>
+  </tbody>
+</table>
+
+<h5 id="首先是运动学方程中">首先是运动学方程中：</h5>
+
+<p>给出下面：</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/image-20200622084611877.png" alt="image-20200622084611877" /></p>
+
+<p>其中 𝜃𝑖 𝑤𝑖 为高斯随机脉冲噪声，均值为0，协方差为 𝑤𝑛 ，𝑤𝑏𝑛 在 𝛥𝑡时间内的积分值。</p>
+
+<p>因此给出误差传播方程：
+<script type="math/tex">% <![CDATA[
+\begin{aligned}
+\delta \mathbf{p} & \leftarrow \delta \mathbf{p}+\delta \mathbf{v} \Delta t \\
+\delta \mathbf{v} & \leftarrow \delta \mathbf{v}+\left(-\mathbf{R}\left[\mathbf{a}_{m}-\mathbf{a}_{b}\right]_{\times} \delta \boldsymbol{\theta}-\mathbf{R} \delta \mathbf{a}_{b}+\delta \mathbf{g}\right) \Delta t+\mathbf{v}_{\mathbf{i}} \\
+\delta \boldsymbol{\theta} & \leftarrow \mathbf{R}^{\top}\left\{\left(\boldsymbol{\omega}_{m}-\boldsymbol{\omega}_{b}\right) \Delta t\right\} \delta \boldsymbol{\theta}-\delta \boldsymbol{\omega}_{b} \Delta t+\boldsymbol{\theta}_{\mathbf{i}} \\
+\delta \mathbf{a}_{b} & \leftarrow \delta \mathbf{a}_{b}+\mathbf{a}_{\mathbf{i}} \\
+\delta \boldsymbol{\omega}_{b} & \leftarrow \delta \boldsymbol{\omega}_{b}+\boldsymbol{\omega}_{\mathbf{i}} \\
+\delta \mathbf{g} & \leftarrow \delta \mathbf{g}
+\end{aligned} %]]></script></p>
+
+<h5 id="其次是测量方程">其次是测量方程：</h5>
+
+<p>测量方程求取雅可比矩阵采用链式法则。</p>
+
+<p>此外有：</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/image-20200622084626045.png" alt="image-20200622084626045" />
+<script type="math/tex">% <![CDATA[
+\left.\mathbf{X}_{\delta \mathbf{x}} \triangleq \frac{\partial \mathbf{x}_{t}}{\partial \delta \mathbf{x}}\right|_{\mathbf{x}}=\left[\begin{array}{ccc}
+\mathbf{I}_{6} & 0 & 0 \\
+0 & \mathbf{Q}_{\delta \boldsymbol{\theta}} & 0 \\
+0 & 0 & \mathbf{I}_{9}
+\end{array}\right] %]]></script>
+总结来说，求取差分的偏导数如下，需要注意的是，我用到的是左栏的结果，右栏中未作考虑。</p>
+
+<p><img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200623093941.png" alt="20200623093941" /></p>
+
+<h5 id="其中有比较重要的推导方法">其中有比较重要的推导方法</h5>
+
+<p>下面是两种链式求导的方法，比较重要。
+<script type="math/tex">\left.\mathbf{H} \triangleq \frac{\partial h}{\partial \delta \mathbf{x}}\right|_{\mathbf{x}}=\left.\left.\frac{\partial h}{\partial \mathbf{x}_{t}}\right|_{\mathbf{x}} \frac{\partial \mathbf{x}_{t}}{\partial \delta \mathbf{x}}\right|_{\mathbf{x}}=\mathbf{H}_{\mathbf{x}} \mathbf{X}_{\delta \mathbf{x}}</script></p>
+
+<script type="math/tex; mode=display">\left.\mathbf{Q}_{\delta \boldsymbol{\theta}} \triangleq \frac{\partial(\mathbf{q} \otimes \delta \mathbf{q})}{\partial \delta \boldsymbol{\theta}}\right|_{\mathbf{q}}=\left.\left.\frac{\partial(\mathbf{q} \otimes \delta \mathbf{q})}{\partial \delta \mathbf{q}}\right|_{\mathbf{q}} \frac{\partial \delta \mathbf{q}}{\partial \delta \boldsymbol{\theta}}\right|_{\hat{\delta} \hat{\theta}=0}</script>
+
+<p><span style="color:blue;"><strong>另外一个重要的性质，在其中的旋转矩阵表示为</strong></span>：</p>
+
+<p>其中特别要注意四元数的旋转方式。
+<script type="math/tex">R=_{b}^{w}R=Exp[_{I}^{G}\delta\theta]=_{I}^{G}\delta q</script>
+<img src="https://chendaxiashizhu-1259416116.cos.ap-beijing.myqcloud.com/20200623140517.png" alt="20200623140517" /></p>
+
+<blockquote>
+  <p>总体来说，需要区分标称值与误差状态量之间的关系。</p>
+</blockquote>
+
+<p>cv中的3d标定：<span style="color:blue;"><strong>T21 = Tbw = 2d2d(pw,pb) = 2d2d(p1,p2)</strong></span></p>
+
+<h5 id="欧拉角的表示">欧拉角的表示</h5>
+
+<p><span style="color:blue;"><strong>另外，观察到q与R都是有方向的，那么欧拉角有没有方向呢？</strong></span>事实证明是有的。</p>
+
+<p><img src="/Users/chenshiming/Library/Application%20Support/typora-user-images/image-20200625102854467.png" alt="image-20200625102854467" /></p>
+
+<p>其中，W是可逆矩阵，这里说明了欧拉角也是存在方向的。上面说明了eulerRates与bodyRates之间的关系，下面表示了逆矩阵。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">cr</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">roll</span><span class="p">);</span>
+ <span class="n">sr</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">roll</span><span class="p">);</span>
+ <span class="n">cp</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">pitch</span><span class="p">);</span>
+ <span class="n">sp</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">pitch</span><span class="p">);</span>
+<span class="n">R</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">sp</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="n">cr</span><span class="p">,</span> <span class="n">sr</span> <span class="o">*</span> <span class="n">cp</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">sr</span><span class="p">,</span> <span class="n">cr</span> <span class="o">*</span> <span class="n">cp</span><span class="p">];</span>
+</code></pre></div></div>
+
+<h5 id="四元数中参与的运算">四元数中参与的运算</h5>
+
+<h4 id="eskf的实现">ESKF的实现</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span> <span class="o">=========================================================================</span>
+<span class="o">%</span>
+<span class="o">%</span>                  <span class="n">ESKF</span><span class="err">的实现</span>
+<span class="o">%</span> 
+<span class="o">%</span>
+<span class="o">%</span> <span class="o">=========================================================================</span>
+<span class="o">%</span>
+<span class="o">%</span><span class="err">　</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="mi">2020</span><span class="o">-</span><span class="mi">2022</span> <span class="n">China</span> <span class="n">Academy</span> <span class="n">of</span> <span class="n">Railway</span> <span class="n">Sciences</span> 
+<span class="o">%</span>   <span class="err">版本：</span><span class="n">V1</span><span class="mf">.0</span>
+<span class="o">%</span>   <span class="err">日期：</span><span class="mi">2020</span><span class="err">年</span> <span class="mi">6</span><span class="err">月</span><span class="mi">23</span><span class="err">日</span>
+<span class="o">%</span>   <span class="err">作者：</span><span class="n">s</span><span class="o">.</span><span class="n">m</span><span class="o">.</span>
+<span class="o">%--------------------------------------------------------------------------</span>
+<span class="o">%</span>  <span class="err">功能：</span><span class="mf">1.</span><span class="err">实现</span><span class="n">ESKF</span><span class="err">算法，加深对于状态估计的理解</span>
+<span class="o">%</span>        <span class="mf">2.</span><span class="err">其中的问题：</span>
+<span class="o">%</span>     <span class="mi">1</span><span class="err">）</span> <span class="err">测量加上地磁计</span>
+<span class="o">%</span>     <span class="mi">2</span><span class="err">）</span> <span class="err">注意误差量与标称量</span>
+<span class="o">%</span>     <span class="mi">3</span><span class="err">）</span> <span class="err">四元数转角度时有误差，就是这个导致了误差量</span>
+<span class="o">%</span>
+<span class="o">%</span>
+<span class="o">%</span>
+<span class="o">%--------------------------------------------------------------------------</span>
+<span class="n">clear</span> <span class="nb">all</span><span class="p">;</span>
+<span class="n">close</span> <span class="nb">all</span><span class="p">;</span>
+<span class="n">addpath</span><span class="p">(</span><span class="s">'../../ESKF-Attitude-Estimation-master'</span><span class="p">)</span>
+<span class="n">addpath</span><span class="p">(</span><span class="s">'../utils'</span><span class="p">)</span>
+<span class="o">%</span> <span class="o">--------------------</span> <span class="kn">import</span> <span class="nn">data</span><span class="o">-------------------</span>
+<span class="n">fileName</span> <span class="o">=</span> <span class="s">'../NAV_1'</span><span class="p">;</span>
+<span class="n">Data</span> <span class="o">=</span> <span class="n">importdata</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">'</span><span class="si">%</span><span class="s">s.mat'</span><span class="p">,</span><span class="n">fileName</span><span class="p">));</span>
+<span class="n">lengthtp</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="n">time</span>    <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">lengthtp</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">roll</span>    <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">lengthtp</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">pitch</span>   <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">lengthtp</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">yaw</span>     <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">lengthtp</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">imuNominalStates</span> <span class="o">=</span> <span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">lengthtp</span><span class="p">);</span>
+<span class="n">imuErrorStates</span>   <span class="o">=</span> <span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">lengthtp</span><span class="p">);</span>
+<span class="n">measurements</span> <span class="o">=</span> <span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">lengthtp</span><span class="p">);</span>
+<span class="o">%</span><span class="n">groundTruth</span>
+<span class="k">for</span> <span class="n">state_k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">lengthtp</span> 
+    <span class="n">measurements</span><span class="p">{</span><span class="n">state_k</span><span class="p">}</span><span class="o">.</span><span class="n">dt</span>    <span class="o">=</span> <span class="mf">0.02</span><span class="p">;</span>                      <span class="o">%</span> <span class="n">sampling</span> <span class="n">times</span> <span class="mi">50</span><span class="n">Hz</span>
+    <span class="n">measurements</span><span class="p">{</span><span class="n">state_k</span><span class="p">}</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span class="n">state_k</span><span class="p">,</span><span class="mi">27</span><span class="p">:</span><span class="mi">29</span><span class="p">)</span><span class="s">';            </span><span class="err">
+</span><span class="s">    measurements{state_k}.acc   = Data(state_k,9:11)'</span><span class="p">;</span>
+    <span class="n">measurements</span><span class="p">{</span><span class="n">state_k</span><span class="p">}</span><span class="o">.</span><span class="n">mag</span>   <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span class="n">state_k</span><span class="p">,</span><span class="mi">15</span><span class="p">:</span><span class="mi">17</span><span class="p">)</span><span class="s">';</span><span class="err">
+</span><span class="s">    time(state_k)=state_k*0.02;</span><span class="err">
+</span><span class="s">end</span><span class="err">
+</span><span class="s">rad2deg = 180/pi;</span><span class="err">
+</span><span class="s">rollRef   = Data(:,30)*rad2deg;</span><span class="err">
+</span><span class="s">pitchRef  = Data(:,31)*rad2deg;</span><span class="err">
+</span><span class="s">yawRef    = Data(:,32)*rad2deg;</span><span class="err">
+</span><span class="si">% --------------------</span><span class="s">Data analysis------------------</span><span class="err">
+</span><span class="si">% ++++++++++++++++++++1</span><span class="s">.initialization++++++++++++++++</span><span class="err">
+</span><span class="s">dt = measurements{1}.dt;</span><span class="err">
+
+</span><span class="si">% </span><span class="s">怎么处理初始化的theta？</span><span class="err">
+</span><span class="s">omega_b = zeros(3,1);</span><span class="si">%%</span><span class="s">这个用到</span><span class="err">
+</span><span class="s">theta = zeros(3,1);</span><span class="si">%%</span><span class="s">这个用不到</span><span class="err">
+
+</span><span class="si">% </span><span class="s">error state initialization</span><span class="err">
+</span><span class="s">dt_theta = zeros(3,1);</span><span class="err">
+</span><span class="s">dt_omega_b = zeros(3,1);</span><span class="err">
+
+</span><span class="si">% </span><span class="s">Keep updated status</span><span class="err">
+</span><span class="s">err_state = [dt_theta;dt_omega_b];</span><span class="err">
+</span><span class="s">quat = zeros(4,1);</span><span class="err">
+
+</span><span class="si">% --------</span><span class="s">Refer to previous practice for initialization-----------------------------------</span><span class="err">
+</span><span class="s">init_angle = [Data(1,30),Data(1,31),Data(1,32)]'</span><span class="p">;</span>
+<span class="n">init_quat</span> <span class="o">=</span> <span class="n">oula2q</span><span class="p">(</span><span class="n">init_angle</span><span class="p">);</span>
+<span class="n">quat</span> <span class="o">=</span> <span class="n">init_quat</span><span class="s">';</span><span class="err">
+</span><span class="si">% -------------------------2</span><span class="s">.covariance matrix ---------------------</span><span class="err">
+</span><span class="s">p1 = 1e-5;p2 =  1e-7;</span><span class="err">
+</span><span class="s">P = blkdiag(p1,p1,p1,p2,p2,p2);</span><span class="si">%%</span><span class="s">初始化</span><span class="err">
+
+</span><span class="s">sigma_wn = 1e-5;</span><span class="err">
+</span><span class="s">sigma_wbn = 1e-9;</span><span class="err">
+</span><span class="s">Theta_i = sigma_wn*dt^2*eye(3);</span><span class="err">
+</span><span class="s">Omega_i = sigma_wbn*dt^2*eye(3);</span><span class="err">
+</span><span class="s">Fi = eye(6);</span><span class="err">
+</span><span class="s">Qi = blkdiag(Theta_i , Omega_i);</span><span class="err">
+</span><span class="s">Q = Fi*Qi*Fi'</span><span class="p">;</span>
+
+<span class="n">sigma_acc</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">;</span>
+<span class="n">sigma_mn</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">;</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">blkdiag</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">sigma_acc</span><span class="p">,</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">sigma_mn</span><span class="p">);</span>
+<span class="k">for</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">lengthtp</span><span class="o">-</span><span class="mi">1</span>
+    <span class="o">%</span> <span class="o">--------------------------</span><span class="n">forecast</span><span class="o">------------</span>
+    <span class="n">omega_m</span> <span class="o">=</span> <span class="p">(</span><span class="n">measurements</span><span class="p">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span><span class="o">.</span><span class="n">omega</span> <span class="o">+</span> <span class="n">measurements</span><span class="p">{</span><span class="n">index</span><span class="p">}</span><span class="o">.</span><span class="n">omega</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+    <span class="n">av</span> <span class="o">=</span> <span class="p">(</span><span class="n">omega_m</span> <span class="o">-</span> <span class="n">omega_b</span><span class="p">)</span><span class="o">*</span><span class="n">dt</span><span class="p">;</span>
+     <span class="n">det_q</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">;</span><span class="mf">0.5</span><span class="o">*</span><span class="n">av</span><span class="p">];</span>
+     <span class="n">quat</span> <span class="o">=</span> <span class="n">quatLeftComp</span><span class="p">(</span><span class="n">quat</span><span class="p">)</span><span class="o">*</span><span class="n">det_q</span><span class="p">;</span>
+     <span class="n">omega_b</span> <span class="o">=</span> <span class="n">omega_b</span><span class="p">;</span>
+     <span class="o">%</span> <span class="err">计算标称值</span>
+    <span class="n">F1</span> <span class="o">=</span> <span class="n">Exp_lee</span><span class="p">((</span><span class="n">measurements</span><span class="p">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span><span class="o">.</span><span class="n">omega</span> <span class="o">-</span> <span class="n">omega_b</span><span class="p">)</span><span class="o">*</span><span class="n">dt</span><span class="p">);</span>
+    <span class="n">F1</span> <span class="o">=</span> <span class="n">F1</span><span class="s">';</span><span class="err">
+</span><span class="s">    Fx = [F1  , -eye(3)*dt;</span><span class="err">
+</span><span class="s">    zeros(3)  , eye(3)];</span><span class="err">
+</span><span class="s">     P_ = Fx*P*Fx'</span> <span class="o">+</span> <span class="n">Q</span><span class="p">;</span>
+     <span class="o">%</span> <span class="o">-----------------------</span><span class="n">observation</span><span class="o">---------------------</span>
+     <span class="o">%</span> <span class="n">Prediction</span> <span class="n">results</span> <span class="ow">and</span> <span class="n">observations</span>
+     <span class="p">[</span><span class="n">H</span><span class="p">,</span><span class="n">detZ</span><span class="p">]</span> <span class="o">=</span> <span class="n">calH</span><span class="p">(</span><span class="n">quat</span><span class="p">,</span>  <span class="n">measurements</span><span class="p">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">});</span>
+     <span class="o">%</span> <span class="o">--------------------</span><span class="n">update</span><span class="o">-----------------</span>
+     <span class="n">K</span> <span class="o">=</span> <span class="n">P_</span><span class="o">*</span><span class="n">H</span><span class="s">'*inv(H*P_*H'</span> <span class="o">+</span> <span class="n">R</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+     <span class="n">err_state</span> <span class="o">=</span> <span class="n">K</span><span class="o">*</span><span class="n">detZ</span><span class="p">;</span>
+     <span class="n">P</span> <span class="o">=</span> <span class="n">P_</span> <span class="o">-</span> <span class="n">K</span><span class="o">*</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">P_</span><span class="o">*</span><span class="n">H</span><span class="s">' + R)*K'</span><span class="p">;</span>
+     <span class="o">%</span> <span class="o">----------------------</span><span class="n">update</span> <span class="n">state</span><span class="o">----------------------</span>
+     <span class="o">%</span> <span class="err">参考之前的函数，</span><span class="n">dt_theta</span><span class="o">--&gt;</span><span class="n">quat</span><span class="p">,</span> <span class="n">quat</span><span class="err">的左乘方法</span>
+     
+     <span class="n">dt_theta</span> <span class="o">=</span> <span class="n">err_state</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">);</span>
+     <span class="n">dt_omega_b</span> <span class="o">=</span> <span class="n">err_state</span><span class="p">(</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">);</span>
+     <span class="n">dt_q</span> <span class="o">=</span> <span class="n">buildUpdateQuat</span><span class="p">(</span><span class="n">dt_theta</span><span class="p">);</span>
+     <span class="n">quat</span> <span class="o">=</span> <span class="n">quatLeftComp</span><span class="p">(</span><span class="n">quat</span><span class="p">)</span><span class="o">*</span><span class="n">dt_q</span><span class="p">;</span>
+     <span class="n">quat</span> <span class="o">=</span> <span class="n">quat</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">quat</span><span class="p">);</span>
+     <span class="n">omega_b</span> <span class="o">=</span> <span class="n">omega_b</span> <span class="o">+</span> <span class="n">dt_omega_b</span><span class="p">;</span>
+     
+     <span class="o">%</span> <span class="o">------</span><span class="n">save</span> <span class="n">angle</span><span class="o">-----------------------------</span>
+     <span class="p">[</span><span class="n">a1</span><span class="p">,</span><span class="n">a2</span><span class="p">,</span><span class="n">a3</span><span class="p">]</span> <span class="o">=</span> <span class="n">quattoeuler</span><span class="p">(</span><span class="n">quat</span><span class="p">);</span>
+     <span class="n">oula</span><span class="p">(</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,:)</span> <span class="o">=</span> <span class="p">[</span><span class="n">a1</span><span class="p">,</span><span class="n">a2</span><span class="p">,</span><span class="n">a3</span><span class="p">]</span><span class="o">/</span><span class="mi">180</span><span class="o">*</span><span class="n">pi</span><span class="p">;</span>
+     <span class="n">dt_theta_save</span><span class="p">(</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,:)</span> <span class="o">=</span> <span class="n">err_state</span><span class="s">';</span><span class="err">
+</span><span class="s">     </span><span class="si">% ----------------------------</span><span class="s">reset-------------------</span><span class="err">
+</span><span class="s">     err_state = zeros(6,1);</span><span class="err">
+</span><span class="s">     G = blkdiag(eye(3) - omegaMatrix(dt_theta/2) ,eye(3));</span><span class="err">
+</span><span class="s">     P = G*P*G'</span><span class="p">;</span>
+<span class="n">end</span>
+
+<span class="o">%</span> <span class="n">figure</span><span class="p">;</span>
+<span class="o">%</span> <span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">%</span> <span class="n">plot</span><span class="p">(</span><span class="n">pitchRef</span><span class="p">);</span>
+<span class="o">%</span> <span class="n">hold</span> <span class="n">on</span><span class="p">;</span><span class="n">plot</span><span class="p">(</span><span class="n">oula</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">);</span>
+<span class="o">%</span> <span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">%</span> <span class="n">plot</span><span class="p">(</span><span class="n">rollRef</span><span class="p">);</span>
+<span class="o">%</span> <span class="n">hold</span> <span class="n">on</span><span class="p">;</span><span class="n">plot</span><span class="p">(</span><span class="n">oula</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">);</span>
+<span class="o">%</span> <span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">%</span> <span class="n">plot</span><span class="p">(</span><span class="n">yawRef</span><span class="p">);</span>
+<span class="o">%</span> <span class="n">hold</span> <span class="n">on</span><span class="p">;</span><span class="n">plot</span><span class="p">(</span><span class="n">oula</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">);</span>
+<span class="o">%</span> <span class="n">legend</span> <span class="mi">1</span> <span class="mi">2</span> 
+
+ <span class="n">rotLim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">5</span> <span class="mi">5</span><span class="p">];</span>
+<span class="n">figure</span><span class="p">;</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">oula</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span> <span class="o">-</span> <span class="n">rollRef</span><span class="p">);</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">oula</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span> <span class="o">-</span> <span class="n">pitchRef</span><span class="p">);</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">oula</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span> <span class="o">-</span> <span class="n">yawRef</span><span class="p">);</span>
+<span class="n">legend</span> <span class="mi">1</span> <span class="mi">2</span> 
+<span class="o">%</span> <span class="n">ylim</span><span class="p">(</span><span class="n">rotLim</span><span class="p">)</span>
+
+
+
+<span class="n">function</span> <span class="n">R</span> <span class="o">=</span> <span class="n">q2R</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="o">%</span><span class="err">四元数转旋转矩阵</span>
+<span class="n">R</span><span class="o">=</span><span class="p">[</span> <span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>    <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">));</span>
+    <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span> <span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>     <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+    <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">];</span>
+<span class="n">R2</span> <span class="o">=</span> <span class="n">R</span><span class="p">;</span>
+<span class="n">end</span>
+
+<span class="n">function</span> <span class="n">Q_dt_theta</span> <span class="o">=</span> <span class="n">cal_Q_dt_theta</span><span class="p">(</span><span class="n">quat</span><span class="p">)</span>
+<span class="n">Q_dt_theta</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span> <span class="p">[</span><span class="o">-</span><span class="n">quat</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="o">-</span><span class="n">quat</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="o">-</span><span class="n">quat</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="o">...</span>
+                <span class="n">quat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="o">-</span><span class="n">quat</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>    <span class="n">quat</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span> <span class="o">...</span>
+                <span class="n">quat</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>   <span class="n">quat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>   <span class="o">-</span><span class="n">quat</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="o">...</span>
+               <span class="o">-</span><span class="n">quat</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="n">quat</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>    <span class="n">quat</span><span class="p">(</span><span class="mi">1</span><span class="p">)];</span> 
+<span class="n">end</span>
+
+<span class="n">function</span> <span class="n">F</span> <span class="o">=</span> <span class="n">Exp_lee</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">omegaMatrix</span><span class="p">(</span><span class="ow">in</span><span class="p">);</span>
+    <span class="n">normV</span>  <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">S</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="o">+</span><span class="n">S</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="o">+</span><span class="n">S</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="n">sin</span><span class="p">(</span><span class="n">normV</span><span class="p">)</span><span class="o">/</span><span class="n">normV</span><span class="o">*</span><span class="n">S</span><span class="p">(:,:)</span><span class="o">+...</span>
+            <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">cos</span><span class="p">(</span><span class="n">normV</span><span class="p">))</span><span class="o">/</span><span class="n">normV</span><span class="o">^</span><span class="mi">2</span><span class="o">*</span><span class="n">S</span><span class="p">(:,:)</span><span class="o">^</span><span class="mi">2</span><span class="p">;</span>
+<span class="n">end</span>
+<span class="n">function</span> <span class="p">[</span><span class="n">omega</span><span class="p">]</span><span class="o">=</span><span class="n">omegaMatrix</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="o">%</span> <span class="n">wx</span><span class="o">=</span><span class="n">data</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">;</span>
+<span class="o">%</span> <span class="n">wy</span><span class="o">=</span><span class="n">data</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">;</span>
+<span class="o">%</span> <span class="n">wz</span><span class="o">=</span><span class="n">data</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">;</span>
+<span class="n">wx</span><span class="o">=</span><span class="n">data</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">wy</span><span class="o">=</span><span class="n">data</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">wz</span><span class="o">=</span><span class="n">data</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">omega</span><span class="o">=</span><span class="p">[</span>
+    <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">wz</span><span class="p">,</span><span class="n">wy</span><span class="p">;</span>
+    <span class="n">wz</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">wx</span><span class="p">;</span>
+    <span class="o">-</span><span class="n">wy</span><span class="p">,</span><span class="n">wx</span><span class="p">,</span><span class="mi">0</span>
+    <span class="p">];</span>
+<span class="n">end</span>
+<span class="n">function</span> <span class="n">q</span> <span class="o">=</span> <span class="n">R2q</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+<span class="o">%</span><span class="err">旋转矩阵转四元数</span>
+<span class="n">t</span><span class="o">=</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">R</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">R</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">R</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+<span class="n">q</span><span class="o">=</span><span class="p">[</span><span class="n">t</span> <span class="p">(</span><span class="n">R</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">R</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">t</span><span class="p">)</span> <span class="p">(</span><span class="n">R</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="n">R</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">t</span><span class="p">)</span> <span class="p">(</span><span class="n">R</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">R</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">t</span><span class="p">)];</span>
+<span class="n">Q1</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+<span class="n">end</span>
+
+<span class="n">function</span>  <span class="n">q</span> <span class="o">=</span> <span class="n">oula2q</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="ow">in</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">y</span> <span class="o">=</span> <span class="ow">in</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">z</span> <span class="o">=</span> <span class="ow">in</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="o">%</span><span class="err">欧拉角转四元数</span>
+<span class="n">q</span> <span class="o">=</span> <span class="p">[</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">...</span>
+    <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">...</span>
+    <span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">...</span>
+    <span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="mi">2</span><span class="p">)];</span>
+
+<span class="n">end</span>
+<span class="n">function</span> <span class="n">Ang3</span> <span class="o">=</span> <span class="n">q2oula</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="o">%</span><span class="err">四元数转欧拉角</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">));</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">asin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)));</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">));</span>
+<span class="n">Ang3</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="n">y</span> <span class="n">z</span><span class="p">];</span>
+<span class="n">end</span>
+
+<span class="n">function</span> <span class="n">updateQuat</span> <span class="o">=</span> <span class="n">buildUpdateQuat</span><span class="p">(</span><span class="n">deltaTheta</span><span class="p">)</span>
+    <span class="n">deltaq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">deltaTheta</span><span class="p">;</span>
+    <span class="n">updateQuat</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">;</span> <span class="n">deltaq</span><span class="p">];</span>
+    <span class="n">updateQuat</span> <span class="o">=</span> <span class="n">updateQuat</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">updateQuat</span><span class="p">);</span>
+<span class="n">end</span>
+
+<span class="n">function</span> <span class="n">qLC</span> <span class="o">=</span> <span class="n">quatLeftComp</span><span class="p">(</span><span class="n">quat</span><span class="p">)</span>
+    <span class="n">vector</span> <span class="o">=</span> <span class="n">quat</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">);</span>
+    <span class="n">scalar</span> <span class="o">=</span> <span class="n">quat</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    
+    <span class="n">qLC</span> <span class="o">=</span> <span class="p">[</span>  <span class="n">scalar</span> <span class="p">,</span>  <span class="o">-</span><span class="n">vector</span><span class="s">';</span><span class="err">
+</span><span class="s">             vector , scalar*eye(3) + crossMat(vector)  ];</span><span class="err">
+</span><span class="s">end</span><span class="err">
+
+</span><span class="s">function [H,detZ] = calH(q,measurements_k)</span><span class="err">
+</span><span class="s">    </span><span class="si">% </span><span class="s">Normalise magnetometer measurement</span><span class="err">
+</span><span class="s">    if(norm(measurements_k.mag) == 0), return; end	</span><span class="si">% </span><span class="err">
+</span><span class="s">    measurements_k.mag = measurements_k.mag / norm(measurements_k.mag);	</span><span class="si">% </span><span class="s">normalise magnitude,very important!!!!</span><span class="err">
+</span><span class="s">    </span><span class="si">% </span><span class="s">Normalise accelerometer measurement</span><span class="err">
+</span><span class="s">    if(norm(measurements_k.acc) == 0), return; end	</span><span class="si">% </span><span class="s">handle NaN</span><span class="err">
+</span><span class="s">    measurements_k.acc  = measurements_k.acc / norm(measurements_k.acc);	</span><span class="si">% </span><span class="s">normalise accelerometer ,very important!!!!</span><span class="err">
+</span><span class="s">    </span><span class="si">% </span><span class="s">Reference direction of Earth'</span><span class="n">s</span> <span class="n">magnetic</span> <span class="n">feild</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">quaternProd</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">quaternProd</span><span class="p">([</span><span class="mi">0</span><span class="p">;</span> <span class="n">measurements_k</span><span class="o">.</span><span class="n">mag</span><span class="p">],</span> <span class="n">quatInv</span><span class="p">(</span><span class="n">q</span><span class="p">)));</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="n">norm</span><span class="p">([</span><span class="n">h</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="n">h</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span> <span class="mi">0</span> <span class="n">h</span><span class="p">(</span><span class="mi">4</span><span class="p">)];</span>
+    <span class="n">Ha</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>                 	<span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>                    <span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>                         <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+         <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>                 	<span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>                   <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>                         <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+          <span class="mi">0</span><span class="p">,</span>                         <span class="mi">4</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>                    <span class="mi">4</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>                         <span class="mi">0</span><span class="p">];</span>
+    <span class="n">Hm</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>                <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>               <span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>       <span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+          <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>	   <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>    <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>       <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+           <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>                <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>	   <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>        <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)];</span>
+    <span class="n">Hx</span> <span class="o">=</span> <span class="p">[</span><span class="n">Ha</span><span class="p">,</span> <span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+          <span class="n">Hm</span><span class="p">,</span> <span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)];</span>
+<span class="o">%</span>     <span class="n">Hx</span> <span class="o">=</span> <span class="p">[</span><span class="n">Ha</span><span class="p">,</span> <span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)];</span>
+    <span class="n">Q_detTheta</span>  <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>    <span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>      <span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+                    <span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>    <span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>       <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> 
+                    <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>     <span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>      <span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> 
+                   <span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>       <span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)];</span>
+    <span class="n">Xx</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="o">*</span><span class="n">Q_detTheta</span> <span class="p">,</span> <span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+          <span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>       <span class="p">,</span> <span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)];</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">Hx</span><span class="o">*</span><span class="n">Xx</span><span class="p">;</span> 
+    
+    <span class="n">detZ_a</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>  <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="n">measurements_k</span><span class="o">.</span><span class="n">acc</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+               <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span> <span class="o">+</span> <span class="n">measurements_k</span><span class="o">.</span><span class="n">acc</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+               <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">measurements_k</span><span class="o">.</span><span class="n">acc</span><span class="p">(</span><span class="mi">3</span><span class="p">)];</span>
+<span class="o">%</span>     <span class="n">detZ</span>   <span class="o">=</span> <span class="n">detZ_a</span><span class="p">;</span>
+    <span class="n">detZ_m</span> <span class="o">=</span><span class="p">[((</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span> <span class="o">+</span> <span class="n">measurements_k</span><span class="o">.</span><span class="n">mag</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+             <span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span> <span class="o">+</span> <span class="n">measurements_k</span><span class="o">.</span><span class="n">mag</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+             <span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="n">measurements_k</span><span class="o">.</span><span class="n">mag</span><span class="p">(</span><span class="mi">3</span><span class="p">))];</span> 
+    <span class="n">detZ</span>   <span class="o">=</span> <span class="p">[</span><span class="n">detZ_a</span><span class="p">;</span><span class="n">detZ_m</span><span class="p">];</span>
+<span class="n">end</span>
+
+
+<span class="n">function</span> <span class="p">[</span><span class="n">roll</span><span class="p">,</span><span class="n">pitch</span><span class="p">,</span><span class="n">yaw</span><span class="p">]</span> <span class="o">=</span> <span class="n">quattoeuler</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="n">rad2deg</span><span class="o">=</span><span class="mi">180</span><span class="o">/</span><span class="n">pi</span><span class="p">;</span>
+<span class="n">T</span><span class="o">=</span><span class="p">[</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>  <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>         <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">));</span>
+    <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>       <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>     <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+    <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>      <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">-</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>          <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span><span class="p">(</span><span class="mi">3</span><span class="p">))];</span><span class="o">%</span><span class="n">cnb</span>
+<span class="n">roll</span>  <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">T</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="n">rad2deg</span><span class="p">;</span>
+<span class="n">pitch</span> <span class="o">=</span> <span class="n">asin</span><span class="p">(</span><span class="o">-</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="n">rad2deg</span><span class="p">;</span>
+<span class="n">yaw</span>   <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">rad2deg</span><span class="o">-</span><span class="mf">8.3</span><span class="p">;</span><span class="o">%%</span><span class="err">这个固定偏差是什么鬼</span>  
+<span class="n">yaw</span>   <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">rad2deg</span><span class="p">;</span><span class="o">%%</span><span class="err">这个固定偏差是什么鬼</span>  
+<span class="n">end</span>
+</code></pre></div></div>
+
+<p>这里面一个很重要的性质就是：
+<script type="math/tex">\delta q=\left[\begin{array}{l}1 \\ \frac{1}{2} \delta \theta\end{array}\right]</script></p>
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>Quaternion kinematics for the error-state Kalman Filter.pdf <a href="#fnref:1" class="reversefootnote">&#8617;</a> <a href="#fnref:1:1" class="reversefootnote">&#8617;<sup>2</sup></a></p>
+    </li>
+  </ol>
+</div>
+
+  </section>
+
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        
+        <li class="next">
+            <a href="/2016/11/%E4%BA%92%E8%A1%A5%E6%BB%A4%E6%B3%A2%E5%99%A8%E7%9A%84%E5%B0%8F%E9%A1%B9%E7%9B%AE/" data-toggle="tooltip" data-placement="top" title="互补滤波器小项目">下一篇：  <span>互补滤波器小项目</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2016/11/IMU%E7%9A%84%E7%A7%AF%E5%88%86%E8%A1%A8%E7%A4%BA/";
+        this.page.identifier = "/2016/11/IMU%E7%9A%84%E7%A7%AF%E5%88%86%E8%A1%A8%E7%A4%BA/";
+    };
+    var disqus_shortname = 'leopard';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/leopardpan" title="@leopardpan 的 Github" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/github.png);"></div>
+            </a>
+          </li>
+          
+
+          
+
+          
+
+          
+          <!-- Zhihu -->
+          <li class="navigation__item_social">
+            <a href="https://www.jianshu.com/u/2ada30d8d0f7" title="@2ada30d8d0f7" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/jianshu.png);"></div>
+            </a>
+          </li>
+
+          
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/5366874726" title="@5366874726 的微博" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/weibo.png);"></div>
+            </a>
+          </li>
+          
+
+          
+          
+
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:leopardpan@icloud.com" title="Contact me">
+              <div class="footer-social-icon" style="background:url(/images/email.png);"></div>
+            </a>
+          </li>
+          
+          
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/rss.png);"></div>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 擦擦擦大侠 2020 Theme by <a href="https://leopardpan.cn/">leopardpan</a> |
+            <iframe
+                style="margin-left: 2px; margin-bottom:-5px;"
+                frameborder="0" scrolling="0" width="91px" height="20px"
+                src="https://ghbtns.com/github-btn.html?user=leopardpan&repo=leopardpan.github.io&type=star&count=true" >
+            </iframe>
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

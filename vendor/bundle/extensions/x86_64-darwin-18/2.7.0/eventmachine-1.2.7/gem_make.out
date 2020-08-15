@@ -1,0 +1,16 @@
+current directory: /Users/chenshiming/Desktop/工作资料/个人文件/常用脚本/leopardpan.github.io/vendor/bundle/gems/eventmachine-1.2.7/ext/fastfilereader
+/usr/local/opt/ruby/bin/ruby -I /usr/local/Cellar/ruby/2.7.1_2/lib/ruby/2.7.0 -r ./siteconf20200815-22803-u5jt1v.rb extconf.rb
+creating Makefile
+
+current directory: /Users/chenshiming/Desktop/工作资料/个人文件/常用脚本/leopardpan.github.io/vendor/bundle/gems/eventmachine-1.2.7/ext/fastfilereader
+make "DESTDIR=" clean
+
+current directory: /Users/chenshiming/Desktop/工作资料/个人文件/常用脚本/leopardpan.github.io/vendor/bundle/gems/eventmachine-1.2.7/ext/fastfilereader
+make "DESTDIR="
+compiling mapper.cpp
+compiling rubymain.cpp
+linking shared-object fastfilereaderext.bundle
+
+current directory: /Users/chenshiming/Desktop/工作资料/个人文件/常用脚本/leopardpan.github.io/vendor/bundle/gems/eventmachine-1.2.7/ext/fastfilereader
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 fastfilereaderext.bundle ./.gem.20200815-22803-u4y57v
