@@ -1,32 +1,32 @@
 # Basic
 title: 擦擦擦大侠
-subtitle: 个人站
-description: 你好啊 朋友
+subtitle: Jocker
+description: 你好，朋友
 # 头像里面的标题
 avatarTitle: cacacadaxia
 # 头像里面的描述
-avatarDesc: iOS / 机器学习
+avatarDesc: fucking grow up
 # url: "https://leopardpan.cn"
 url: "http://cacacadaxia.github.io"
-
+# /Users/chenshiming/Desktop/tmp/cacacadaxia.github.io
 # 博客是否自动生成目录，false为不生成
 enableToc: true
 
 # Comment
 comment:
     # livere: MTAyMC81MDk5NC8yNzQ3Ng  # https://www.livere.com
-    disqus: leopard
+    # disqus: leopard
     # uyan: 2143225  # 有言id,登录有言官网申请
 
 # Social
 social:
-    weibo: 5366874726 
-    github: leopardpan
+    # weibo: 5366874726 
+    github: cacacadaxia
     # zhihu: panpanleopard
     # juejin: xxx
-    jianshu: 2ada30d8d0f7
+    # jianshu: 2ada30d8d0f7
     # twitter: 
-    mail: leopardpan@icloud.com
+    mail: chenshiming199510@icloud.com
 
 
 # 百度统计 
@@ -40,16 +40,7 @@ ga:
     id: UA-84134159-3  
     host: auto  
 
-
-# 《----------------- 上面的信息修改成你自己的 ---------------------------》
-#
-#
-#  _post/ 下的文章更换成你自己的文章
-#  帮忙star一下，感谢~😆 地址： https://github.com/leopardpan/leopardpan.github.io
-#
-#
-# 《--------------- 下面的信息可以自行选择是否修改 ------------------------》
-
+# 下面可以修改=
 
 permalink: /:year/:month/:title/
 # Format
